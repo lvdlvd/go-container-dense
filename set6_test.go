@@ -16,4 +16,11 @@ func TestSet6(t *testing.T) {
 			t.Errorf("%dth element is not at ordinal %d (%v)", i, n, ok)
 		}
 	}
+
+	if n, ok := s.Ordinal(10); n != 4 || ok {
+		t.Errorf("Ordinal of elem 10 in %v: expected 4, false, got %v, %v", s, n, ok)
+	}
+	if n, ok := s.Ordinal(63); n != 5 || ok {
+		t.Errorf("Ordinal of elem 63 in %v: expected 5, false, got %v, %v", s, n, ok)
+	}
 }
