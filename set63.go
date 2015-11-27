@@ -482,6 +482,7 @@ func (s Set63) Count() (n uint64) {
 
 // Ordinal returns the number of elements in s that are smaller than elem
 // and a boolean indicating if elem is actually in the set.
+// TBD return int?
 func (s Set63) Ordinal(elem int64) (n uint64, ok bool) {
 	if elem < 0 {
 		return
