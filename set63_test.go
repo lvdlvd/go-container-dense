@@ -127,7 +127,7 @@ func TestSetEmpty(t *testing.T) {
 		t.Error("Emtpy set count", v, s)
 	}
 
-	s.ForEach(func(e int64) bool { 
+	s.ForEach(func(e int64) bool {
 		t.Error("Emtpy set has element", e)
 		return true
 	})
@@ -141,6 +141,9 @@ func TestSetEmpty(t *testing.T) {
 	}
 	if !s.Intersection(s).IsEmpty() {
 		t.Error("Emtpy set ∪ itself not empty", s)
+	}
+	if n, ok := s.Ordinal(42); n != 0 || ok {
+		t.Error("Empty set finds ordinal.")
 	}
 }
 
@@ -157,6 +160,9 @@ func TestSetFull(t *testing.T) {
 	}
 	if v := s.Complement(); !v.IsEmpty() {
 		t.Error("full complement ", []cell63(v), "is not empty")
+	}
+	if n, ok := s.Ordinal(42); n != 42 || !ok {
+		t.Errorf("Expecting ordinal of 42 in full set to be 42, got %v %v", n, ok)
 	}
 }
 
@@ -187,9 +193,21 @@ func TestSet1(t *testing.T) {
 	}
 
 	v := []int64{1, 2, 3, 4, 16, 17, 18, 19}
-	for _, e := range v {
+	for i, e := range v {
 		if !s.Contains(e) {
 			t.Error("Set fails to contain element", e)
+		}
+		if n, ok := s.Ordinal(e); n != uint64(i) || !ok {
+			t.Errorf("%dth element is not at ordinal %d (%v)", i, n, ok)
+		}
+	}
+
+	for _, e := range []int64{5, 6} {
+		if s.Contains(e) {
+			t.Error("Set contains unexpected element", e)
+		}
+		if n, ok := s.Ordinal(e); n != 4 || ok {
+			t.Errorf("expected 4, false, got ordinal %d (%v)", n, ok)
 		}
 	}
 
@@ -202,13 +220,13 @@ func TestSet1(t *testing.T) {
 		return true
 	})
 
-	ch := make(chan struct { Begin, End int64 })
+	ch := make(chan struct{ Begin, End int64 })
 	go func() {
 		s.ForEachInterval(func(b, e int64) bool {
-			ch <- struct{Begin,End int64}{b, e}
+			ch <- struct{ Begin, End int64 }{b, e}
 			return true
 		})
-		close (ch)
+		close(ch)
 	}()
 	e, ok := <-ch
 	if !ok {

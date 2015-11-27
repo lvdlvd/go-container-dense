@@ -131,7 +131,7 @@ func NewSet63(elem ...int64) Set63 {
 		e := singleton(ee)
 		l := len(ss) - 1
 
-		if l >= 0 && ss[l].contains(e) {  // includes the case ss[l] == e
+		if l >= 0 && ss[l].contains(e) { // includes the case ss[l] == e
 			continue
 		}
 
@@ -165,7 +165,7 @@ func (s Set63) head()  (sh, st Set63) {
 */
 
 // return s' first contiguous interval and the remainder, and the first begin and end
-// NOTE if we relax this to < and keep max end we could do operations on unnormalized (but still sorted) sets almost as efficiently 
+// NOTE if we relax this to < and keep max end we could do operations on unnormalized (but still sorted) sets almost as efficiently
 func (s Set63) headx() (sh, st Set63, b, e uint64) {
 	if len(s) == 0 {
 		return nil, s, 0, 0
@@ -197,7 +197,7 @@ func (s Set63) Union(t Set63) Set63 {
 	for sb != se && tb != te {
 
 		//log.Println("ss: ", []cell63(ss), "  s: ", []cell63(s))
-		//log.Println("tt: ", []cell63(tt), "  t: ", []cell63(t)) 
+		//log.Println("tt: ", []cell63(tt), "  t: ", []cell63(t))
 		//log.Println("from s: [", sb, ", ", se, ") from t: [", tb, ", ", te, ")")
 
 		// 6 possibilities:
@@ -480,6 +480,25 @@ func (s Set63) Count() (n uint64) {
 	return
 }
 
+// Ordinal returns the number of elements in s that are smaller than elem
+// and a boolean indicating if elem is actually in the set.
+func (s Set63) Ordinal(elem int64) (n uint64, ok bool) {
+	if elem < 0 {
+		return
+	}
+	for _, v := range s {
+		if uint64(elem) < v.end() {
+			if v.begin() <= uint64(elem) {
+				n += uint64(elem) - v.begin()
+				ok = true
+			}
+			return
+		}
+		n += uint64(v.lsb())
+	}
+	return
+}
+
 // Span returns the smallest and the largest element inclusive of s, or 0,-1 if s is empty.
 func (s Set63) Span() (begin, end int64) {
 	if len(s) == 0 {
@@ -503,7 +522,7 @@ func (s Set63) ForEach(f func(int64) bool) {
 func (s Set63) ForEachInterval(f func(b, e int64) bool) {
 	_, s, sb, se := s.headx()
 	for sb != se {
-		if !f(int64(sb), int64(se - 1)) {
+		if !f(int64(sb), int64(se-1)) {
 			return
 		}
 		_, s, sb, se = s.headx()
@@ -540,7 +559,6 @@ func (s Set63) unnormalized() (r []cell63) {
 	}
 	return
 }
-
 
 // int64Slice implements sort.Interface
 type int64Slice []int64
