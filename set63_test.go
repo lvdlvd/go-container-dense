@@ -202,7 +202,7 @@ func TestSet1(t *testing.T) {
 		}
 	}
 
-	for _, e := range []int64{5, 6} {
+	for _, e := range []int64{5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} {
 		if s.Contains(e) {
 			t.Error("Set contains unexpected element", e)
 		}
